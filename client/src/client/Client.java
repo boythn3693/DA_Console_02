@@ -195,8 +195,7 @@ public class Client {
                 
                 
                 outToFile.write(fileByteArray);
-                System.out.println("Received: Sequence number:"
-                        + findLast);
+                System.out.println("Received: Sequence number:" + findLast);
 
                 // Send acknowledgement
                 sendAck(findLast, socket, address, port);

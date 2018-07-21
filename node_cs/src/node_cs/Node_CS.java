@@ -74,19 +74,6 @@ public class Node_CS {
     
     public static void setUp() throws IOException {
         try {       
-            //phản hồi đến client khi kết nối thành công
-            //DatagramSocket ds = new DatagramSocket(_nodePort);
-            //byte[] receivedData = new byte[PIECES_OF_FILE_SIZE];
-            // nhận kết nối từ client
-//                DatagramPacket pk = new DatagramPacket(receivedData, receivedData.length);
-//                ds.receive(pk);
-//                System.out.println("Đã nhận yêu cầu tải tập tin từ Client !");     
-//                setPort(pk.getPort());
-//                fileName = new String(pk.getData());
-//                setFileName(fileName);
-//                setDestFile(_Paths + "\\" + fileName);
-//                ds.close();
-
             DatagramSocket socket = new DatagramSocket(_nodePort);
             byte[] receivedData = new byte[PIECES_OF_FILE_SIZE];
             //File file;
@@ -202,6 +189,7 @@ public class Node_CS {
                 }
                 // we did not receive an ack
                 catch (SocketTimeoutException e) {
+                    System.out.println(e.getMessage());
                     System.out.println("Socket timed out waiting for the ");
                     ackRec = false;
                 }
