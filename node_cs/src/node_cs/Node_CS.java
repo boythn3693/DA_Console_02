@@ -11,15 +11,12 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.Map;
@@ -80,7 +77,7 @@ public class Node_CS {
             //while (true) {
                 DatagramPacket pk = new DatagramPacket(receivedData, receivedData.length);
                 socket.receive(pk);
-                InetAddress inetAddress = InetAddress.getLocalHost();
+                InetAddress inetAddress = pk.getAddress();
                 System.out.println("Đã nhận yêu cầu tải tập tin từ Client !");     
                 setPort(pk.getPort());
                 fileName = new String(pk.getData());
@@ -88,7 +85,7 @@ public class Node_CS {
                 setDestFile(_Paths + "\\" + fileName);
                 // nhận kết nối từ client
                 String saveFileAs = getDestFileName();
-                byte[] saveFileAsData = saveFileAs.getBytes("UTF-8");
+                byte[] saveFileAsData = saveFileAs.getBytes();
 
                 System.out.println("Bắt đầu gửi File!");
                 DatagramPacket fileStatPacket = new DatagramPacket(saveFileAsData, saveFileAsData.length, inetAddress, getPort());
@@ -120,7 +117,7 @@ public class Node_CS {
     private static void sendServerFinalStatistics(DatagramSocket socket, InetAddress address, String finalStatString) throws UnsupportedEncodingException {
         byte[] bytesData;
         // convert string to bytes so we can send
-        bytesData = finalStatString.getBytes("UTF-8");
+        bytesData = finalStatString.getBytes();
         DatagramPacket statPacket = new DatagramPacket(bytesData, bytesData.length, address, getPort());
         try {
             socket.send(statPacket);
@@ -197,6 +194,8 @@ public class Node_CS {
                 // everything is ok so we can move on to next packet
                 // Break if there is an acknowledgment next packet can be sent
                 if ((ackSequence == sequenceNumber) && (ackRec)) {
+                    System.out.println("Bị xui");
+                    
                     System.out.println("Ack received: Sequence Number = " + ackSequence);
                     break;
                 }
@@ -277,14 +276,6 @@ public class Node_CS {
 
     private static String getDestFileName() {
         return destFileName;
-    }
-
-    private static String getHostname() {
-        return hostName;
-    }
-
-    private static void setHostname(String passed_host_name) {
-        hostName = passed_host_name;
     }
     
     //START UDP

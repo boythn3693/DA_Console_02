@@ -5,10 +5,8 @@
  */
 package client;
 
-import java.awt.Container;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -16,8 +14,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
-import java.util.Random;
 import java.util.Scanner;
 
 /**
@@ -72,7 +68,7 @@ public class Client {
         byte[] receiveData = new byte[PIECES_OF_FILE_SIZE];
         
         String sentence = _fileName;
-        sendData = sentence.getBytes("UTF-8");
+        sendData = sentence.getBytes();
         //Connect đến Node
         DatagramSocket ds = new DatagramSocket();
         InetAddress iaddr = InetAddress.getByName(_ipNode);
