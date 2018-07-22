@@ -16,6 +16,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
@@ -70,47 +71,49 @@ public class Node_CS {
     }
     
     public static void setUp() throws IOException {
-        try {       
-            DatagramSocket socket = new DatagramSocket(_nodePort);
-            byte[] receivedData = new byte[PIECES_OF_FILE_SIZE];
-            //File file;
-            //while (true) {
+        while (true) {
+            try {       
+                DatagramSocket socket = new DatagramSocket(_nodePort);
+                byte[] receivedData = new byte[PIECES_OF_FILE_SIZE];
+                //File file;
                 DatagramPacket pk = new DatagramPacket(receivedData, receivedData.length);
-                socket.receive(pk);
-                InetAddress inetAddress = pk.getAddress();
-                System.out.println("Đã nhận yêu cầu tải tập tin từ Client !");     
-                setPort(pk.getPort());
-                fileName = new String(pk.getData());
-                setFileName(fileName);
-                setDestFile(_Paths + "\\" + fileName);
-                // nhận kết nối từ client
-                String saveFileAs = getDestFileName();
-                byte[] saveFileAsData = saveFileAs.getBytes();
 
-                System.out.println("Bắt đầu gửi File!");
-                DatagramPacket fileStatPacket = new DatagramPacket(saveFileAsData, saveFileAsData.length, inetAddress, getPort());
-                socket.send(fileStatPacket);                
-                // Create a byte array to store file
-                //InputStream inFromFile = new FileInputStream(file);
+                    socket.receive(pk);
+                    InetAddress inetAddress = pk.getAddress();
+                    System.out.println("Đã nhận yêu cầu tải tập tin từ Client !");     
+                    setPort(pk.getPort());
+                    fileName = new String(pk.getData());
+                    setFileName(fileName);
+                    setDestFile(_Paths + "\\" + fileName);
+                    // nhận kết nối từ client
+                    String saveFileAs = getDestFileName();
+                    byte[] saveFileAsData = saveFileAs.getBytes();
 
-                //File file = new File(getDestFileName());
-                //System.out.println(file.length());
-                int file_length = Integer.parseInt(map.get(getFileName().trim()));                
-                //byte[] fileByteArray = new byte[(int)file.length()];
-                byte[] dataSend = new byte[file_length];
-                FileInputStream fis = new FileInputStream(getDestFileName().trim());
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                fis.read(dataSend);
-                baos.write(dataSend);
-                
+                    System.out.println("Bắt đầu gửi File!");
+                    DatagramPacket fileStatPacket = new DatagramPacket(saveFileAsData, saveFileAsData.length, inetAddress, getPort());
+                    socket.send(fileStatPacket);                
+                    // Create a byte array to store file
+                    //InputStream inFromFile = new FileInputStream(file);
 
-                startTimer();
-                beginTransfer(socket, dataSend, inetAddress);
-                String finalStatString = getFinalStatistics(dataSend, retransmitted);
-                sendServerFinalStatistics(socket, inetAddress, finalStatString);
-            //}
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
+                    //File file = new File(getDestFileName());
+                    //System.out.println(file.length());
+                    int file_length = Integer.parseInt(map.get(getFileName().trim()));                
+                    //byte[] fileByteArray = new byte[(int)file.length()];
+                    byte[] dataSend = new byte[file_length];
+                    FileInputStream fis = new FileInputStream(getDestFileName().trim());
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    fis.read(dataSend);
+                    baos.write(dataSend);
+
+
+                    startTimer();
+                    beginTransfer(socket, dataSend, inetAddress);
+                    String finalStatString = getFinalStatistics(dataSend, retransmitted);
+                    sendServerFinalStatistics(socket, inetAddress, finalStatString);
+
+            } catch (IOException ex) {
+                //System.out.println(ex.getMessage());
+            }
         }
     }
 
@@ -130,7 +133,7 @@ public class Node_CS {
         int sequenceNumber = 0;
         boolean flag;
         int ackSequence = 0;
-        System.out.println("Dung lượng file: "+fileByteArray.length);
+        //System.out.println("Dung lượng file: "+fileByteArray.length);
         for (int i = 0; i < fileByteArray.length; i = i + 1021) {
             sequenceNumber += 1;
             // Create message
@@ -186,7 +189,7 @@ public class Node_CS {
                 }
                 // we did not receive an ack
                 catch (SocketTimeoutException e) {
-                    System.out.println(e.getMessage());
+                    //System.out.println(e.getMessage());
                     System.out.println("Socket timed out waiting for the ");
                     ackRec = false;
                 }
@@ -194,8 +197,6 @@ public class Node_CS {
                 // everything is ok so we can move on to next packet
                 // Break if there is an acknowledgment next packet can be sent
                 if ((ackSequence == sequenceNumber) && (ackRec)) {
-                    System.out.println("Bị xui");
-                    
                     System.out.println("Ack received: Sequence Number = " + ackSequence);
                     break;
                 }
@@ -351,12 +352,13 @@ public class Node_CS {
                 os.flush();
 
                 String result = is.readUTF();
-                System.out.println(result);
+                //System.out.println(result);
                 is.close();
                 os.close();
                 socket.close();
             } catch (IOException ex) {
-                System.out.println(ex.getMessage());
+               // System.out.println(ex.getMessage());
+                return;
             }
 
             // Mở kết nối UDP chờ Client kết nối đến
